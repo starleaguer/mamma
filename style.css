@@ -504,6 +504,15 @@ body {
   .container { padding: 1.5rem 1rem 3rem; }
   .hero { padding: 2rem 0 1.5rem; }
   .search-box { flex-direction: column; }
-  .search-btn { width: 100%; padding: 0.9rem; }
+  .input-wrapper { min-width: 100%; }
+  .search-actions { flex-direction: column; width: 100%; }
+  .search-btn, .add-btn { width: 100%; padding: 0.9rem; }
   .modal-card { padding: 2rem 1.2rem; }
+  
+  /* Form Mobile Optimization */
+  .form-group.row { flex-direction: column; gap: 0.6rem; }
+  .field.narrow { flex: auto; }
+  .form-footer { flex-direction: column; align-items: stretch; }
+  .form-footer .action-btn, 
+  .form-footer .search-btn { width: 100%; }
 }

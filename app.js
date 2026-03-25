@@ -500,7 +500,7 @@ async function saveRecipe() {
     // Update Local State
     RECIPES[index].steps = newSteps;
     selectedModal.steps = newSteps;
-    
+
     // Refresh modal view
     modalSteps.innerHTML = newSteps.map(s => `<li>${s}</li>`).join('');
     setEditMode(false);
@@ -580,14 +580,14 @@ async function handleAddRecipe(e) {
 
   // Add to global array
   RECIPES.unshift(newRecipe); // Add to beginning
-  
+
   // Visual Feedback & Refresh
   closeAddModal();
-  
+
   // Clear search and show new recipe
   searchInput.value = name;
   search();
-  
+
   // Scroll to results
   resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
