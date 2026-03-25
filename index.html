@@ -100,12 +100,9 @@
           <div class="modal-actions">
             <button id="editBtn" class="action-btn">✏️ 수정</button>
             <button id="deleteBtn" class="action-btn delete-btn">🗑️ 삭제</button>
-            <button id="saveBtn" class="action-btn hidden">💾 저장</button>
-            <button id="cancelBtn" class="action-btn hidden">✕ 취소</button>
           </div>
         </div>
         <ol class="modal-steps" id="modalSteps"></ol>
-        <textarea id="modalStepsEdit" class="modal-steps-edit hidden" placeholder="조리 방법을 한 줄씩 입력하세요."></textarea>
       </div>
       <div class="modal-tip" id="modalTip"></div>
     </div>
@@ -115,8 +112,8 @@
   <div id="addRecipeModal" class="modal-overlay hidden">
     <div class="modal-card">
       <button class="modal-close" id="addModalClose">✕</button>
-      <h2 class="modal-title">새 레시피 등록 🍳</h2>
-      <p class="modal-subtitle">나만의 특별한 유아식 메뉴를 추가해보세요.</p>
+      <h2 class="modal-title" id="formModalTitle">새 레시피 등록 🍳</h2>
+      <p class="modal-subtitle" id="formModalSubtitle">나만의 특별한 유아식 메뉴를 추가해보세요.</p>
 
       <form id="addRecipeForm" class="add-form">
         <div class="form-group row">
@@ -171,7 +168,7 @@
 
         <div class="form-footer">
           <button type="button" class="action-btn large" id="addModalCancel">취소</button>
-          <button type="submit" class="search-btn">저장하기</button>
+          <button type="submit" class="search-btn" id="formSubmitBtn">저장하기</button>
         </div>
       </form>
     </div>

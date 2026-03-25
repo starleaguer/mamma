@@ -312,10 +312,7 @@ const recipeModal = document.getElementById('recipeModal');
 const modalClose = document.getElementById('modalClose');
 const editBtn = document.getElementById('editBtn');
 const deleteBtn = document.getElementById('deleteBtn');
-const saveBtn = document.getElementById('saveBtn');
-const cancelBtn = document.getElementById('cancelBtn');
 const modalSteps = document.getElementById('modalSteps');
-const modalStepsEdit = document.getElementById('modalStepsEdit');
 
 // Add Recipe Modal
 const addRecipeBtn = document.getElementById('addRecipeBtn');
@@ -323,6 +320,12 @@ const addRecipeModal = document.getElementById('addRecipeModal');
 const addModalClose = document.getElementById('addModalClose');
 const addModalCancel = document.getElementById('addModalCancel');
 const addRecipeForm = document.getElementById('addRecipeForm');
+
+const formModalTitle = document.getElementById('formModalTitle');
+const formModalSubtitle = document.getElementById('formModalSubtitle');
+const formSubmitBtn = document.getElementById('formSubmitBtn');
+
+let editingRecipeId = null;
 
 // ===== SEARCH LOGIC =====
 function normalize(str) {
@@ -395,6 +398,7 @@ function createCard(recipe, matchedKeywords, idx) {
   div.setAttribute('role', 'button');
   div.setAttribute('tabindex', '0');
   div.setAttribute('aria-label', recipe.name + ' 레시피 보기');
+  div.dataset.recipeId = String(recipe.id);
 
   const tagHTML = recipe.ingredients.map(ing => {
     const isMatch = matchedKeywords.some(kw =>
@@ -439,75 +443,35 @@ function openModal(recipe, matchedKeywords) {
   document.getElementById('modalTip').textContent = recipe.tip;
 
   // Reset to view mode
-  setEditMode(false);
-
   recipeModal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
 
-function setEditMode(isEdit) {
-  if (isEdit) {
-    modalSteps.classList.add('hidden');
-    modalStepsEdit.classList.remove('hidden');
-    editBtn.classList.add('hidden');
-    deleteBtn.classList.add('hidden');
-    saveBtn.classList.remove('hidden');
-    cancelBtn.classList.remove('hidden');
-    // Load text
-    modalStepsEdit.value = selectedModal.steps.join('\n');
-  } else {
-    modalSteps.classList.remove('hidden');
-    modalStepsEdit.classList.add('hidden');
-    editBtn.classList.remove('hidden');
-    deleteBtn.classList.remove('hidden');
-    saveBtn.classList.add('hidden');
-    cancelBtn.classList.add('hidden');
-  }
-}
-
-async function saveRecipe() {
+function openEditForm() {
   if (!selectedModal) return;
+  
+  editingRecipeId = selectedModal.id;
+  
+  // Fill the form
+  document.getElementById('newName').value = selectedModal.name;
+  document.getElementById('newEmoji').value = selectedModal.emoji;
+  document.getElementById('newAge').value = selectedModal.age;
+  document.getElementById('newTime').value = selectedModal.time;
+  document.getElementById('newDifficulty').value = selectedModal.difficulty;
+  document.getElementById('newIngredients').value = selectedModal.ingredients.join(', ');
+  document.getElementById('newDescription').value = selectedModal.description;
+  document.getElementById('newSteps').value = selectedModal.steps.join('\n');
+  document.getElementById('newTip').value = selectedModal.tip;
 
-  const newSteps = modalStepsEdit.value
-    .split('\n')
-    .map(s => s.trim())
-    .filter(Boolean);
+  // Change texts
+  formModalTitle.textContent = '레시피 수정 ✏️';
+  formModalSubtitle.textContent = '기존 메뉴의 내용을 수정합니다.';
+  formSubmitBtn.textContent = '수정하기';
 
-  if (newSteps.length === 0) {
-    alert('조리 방법을 최소 한 개 이상 입력해주세요.');
-    return;
-  }
-
-  // Find and update in original array
-  const index = RECIPES.findIndex(r => r.id === selectedModal.id);
-  if (index !== -1) {
-    // Show saving status
-    saveBtn.textContent = '저장 중...';
-    saveBtn.disabled = true;
-
-    // Supabase Update
-    const { error } = await supabaseClient
-      .from('recipes')
-      .update({ steps: newSteps })
-      .eq('id', selectedModal.id);
-
-    saveBtn.textContent = '💾 저장';
-    saveBtn.disabled = false;
-
-    if (error) {
-      console.error('Error updating recipe:', error);
-      alert('저장에 실패했습니다. 다시 시도해 주세요.');
-      return;
-    }
-
-    // Update Local State
-    RECIPES[index].steps = newSteps;
-    selectedModal.steps = newSteps;
-
-    // Refresh modal view
-    modalSteps.innerHTML = newSteps.map(s => `<li>${s}</li>`).join('');
-    setEditMode(false);
-  }
+  // Close detail modal and open form modal
+  closeModal();
+  addRecipeModal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
 }
 
 async function deleteRecipe() {
@@ -519,10 +483,12 @@ async function deleteRecipe() {
   deleteBtn.textContent = '삭제 중...';
   deleteBtn.disabled = true;
 
+  const deletedId = selectedModal.id;
+
   const { error } = await supabaseClient
     .from('recipes')
     .delete()
-    .eq('id', selectedModal.id);
+    .eq('id', deletedId);
 
   deleteBtn.textContent = '🗑️ 삭제';
   deleteBtn.disabled = false;
@@ -534,11 +500,34 @@ async function deleteRecipe() {
   }
 
   // Remove from global array
-  RECIPES = RECIPES.filter(r => r.id !== selectedModal.id);
+  RECIPES = RECIPES.filter(r => r.id !== deletedId);
 
-  // Close modal and refresh search
+  // Close modal first
   closeModal();
-  search();
+
+  // Refresh UI
+  const raw = searchInput.value.trim();
+  if (raw) {
+    // Active search — re-run to update results
+    search();
+  } else {
+    // No search query — remove the deleted card directly from DOM
+    const card = recipeGrid.querySelector(`[data-recipe-id="${deletedId}"]`);
+    if (card) card.remove();
+
+    // Update result count
+    const countBadge = document.getElementById('resultsCount');
+    if (countBadge) {
+      const current = parseInt(countBadge.textContent) || 0;
+      if (current > 0) countBadge.textContent = `${current - 1}개 레시피`;
+    }
+
+    // Show empty state if no cards left
+    if (recipeGrid.children.length === 0) {
+      resultsHeader.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+    }
+  }
 }
 
 function closeModal() {
@@ -547,9 +536,13 @@ function closeModal() {
   selectedModal = null;
 }
 
-// ===== ADD RECIPE =====
 function openAddModal() {
+  editingRecipeId = null;
   addRecipeForm.reset();
+  formModalTitle.textContent = '새 레시피 등록 🍳';
+  formModalSubtitle.textContent = '나만의 특별한 유아식 메뉴를 추가해보세요.';
+  formSubmitBtn.textContent = '저장하기';
+  
   addRecipeModal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -580,8 +573,7 @@ async function handleAddRecipe(e) {
   const ingredients = ingredientsStr.split(/[,，\s]+/).map(s => s.trim()).filter(Boolean);
   const steps = stepsStr.split('\n').map(s => s.trim()).filter(Boolean);
 
-  const newRecipe = {
-    id: Date.now(), // Unique ID
+  const recipeData = {
     emoji,
     name,
     age,
@@ -597,28 +589,51 @@ async function handleAddRecipe(e) {
   submitBtn.textContent = '저장 중...';
   submitBtn.disabled = true;
 
-  // Supabase Insert
-  const { data, error } = await supabaseClient
-    .from('recipes')
-    .insert([newRecipe])
-    .select();
+  if (editingRecipeId) {
+    // === UPDATE EXISTING ===
+    const { error } = await supabaseClient
+      .from('recipes')
+      .update(recipeData)
+      .eq('id', editingRecipeId);
 
-  submitBtn.textContent = '저장하기';
-  submitBtn.disabled = false;
+    submitBtn.textContent = '수정하기';
+    submitBtn.disabled = false;
 
-  if (error) {
-    console.error('Error adding new recipe:', error);
-    alert('등록에 실패했습니다. 다시 시도해 주세요.');
-    return;
+    if (error) {
+      console.error('Error updating recipe:', error);
+      alert('수정에 실패했습니다. 다시 시도해 주세요.');
+      return;
+    }
+
+    // Update global array
+    const idx = RECIPES.findIndex(r => r.id === editingRecipeId);
+    if (idx !== -1) {
+      RECIPES[idx] = { ...RECIPES[idx], ...recipeData };
+    }
+  } else {
+    // === INSERT NEW ===
+    recipeData.id = Date.now(); // Generate new ID
+    const { error } = await supabaseClient
+      .from('recipes')
+      .insert([recipeData]);
+
+    submitBtn.textContent = '저장하기';
+    submitBtn.disabled = false;
+
+    if (error) {
+      console.error('Error adding new recipe:', error);
+      alert('등록에 실패했습니다. 다시 시도해 주세요.');
+      return;
+    }
+
+    // Add to global array
+    RECIPES.unshift(recipeData);
   }
-
-  // Add to global array
-  RECIPES.unshift(newRecipe); // Add to beginning
 
   // Visual Feedback & Refresh
   closeAddModal();
 
-  // Clear search and show new recipe
+  // Search for the added/edited recipe to show it
   searchInput.value = name;
   search();
 
@@ -656,10 +671,8 @@ addRecipeModal.addEventListener('click', e => {
   if (e.target === addRecipeModal) closeAddModal();
 });
 
-editBtn.addEventListener('click', () => setEditMode(true));
+editBtn.addEventListener('click', openEditForm);
 deleteBtn.addEventListener('click', deleteRecipe);
-cancelBtn.addEventListener('click', () => setEditMode(false));
-saveBtn.addEventListener('click', saveRecipe);
 
 recipeModal.addEventListener('click', e => {
   if (e.target === recipeModal) closeModal();

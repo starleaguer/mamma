@@ -1,0 +1,7 @@
+yt-dlp
+openai-whisper
+openai
+supabase
+python-dotenv
+opencv-python
+easyocr
