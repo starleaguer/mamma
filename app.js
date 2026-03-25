@@ -311,6 +311,7 @@ const initialState = document.getElementById('initialState');
 const recipeModal = document.getElementById('recipeModal');
 const modalClose = document.getElementById('modalClose');
 const editBtn = document.getElementById('editBtn');
+const deleteBtn = document.getElementById('deleteBtn');
 const saveBtn = document.getElementById('saveBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 const modalSteps = document.getElementById('modalSteps');
@@ -449,6 +450,7 @@ function setEditMode(isEdit) {
     modalSteps.classList.add('hidden');
     modalStepsEdit.classList.remove('hidden');
     editBtn.classList.add('hidden');
+    deleteBtn.classList.add('hidden');
     saveBtn.classList.remove('hidden');
     cancelBtn.classList.remove('hidden');
     // Load text
@@ -457,6 +459,7 @@ function setEditMode(isEdit) {
     modalSteps.classList.remove('hidden');
     modalStepsEdit.classList.add('hidden');
     editBtn.classList.remove('hidden');
+    deleteBtn.classList.remove('hidden');
     saveBtn.classList.add('hidden');
     cancelBtn.classList.add('hidden');
   }
@@ -505,6 +508,37 @@ async function saveRecipe() {
     modalSteps.innerHTML = newSteps.map(s => `<li>${s}</li>`).join('');
     setEditMode(false);
   }
+}
+
+async function deleteRecipe() {
+  if (!selectedModal) return;
+
+  const confirmed = confirm(`'${selectedModal.name}' 레시피를 정말로 삭제하시겠습니까?`);
+  if (!confirmed) return;
+
+  deleteBtn.textContent = '삭제 중...';
+  deleteBtn.disabled = true;
+
+  const { error } = await supabaseClient
+    .from('recipes')
+    .delete()
+    .eq('id', selectedModal.id);
+
+  deleteBtn.textContent = '🗑️ 삭제';
+  deleteBtn.disabled = false;
+
+  if (error) {
+    console.error('Error deleting recipe:', error);
+    alert('삭제에 실패했습니다. 다시 시도해 주세요.');
+    return;
+  }
+
+  // Remove from global array
+  RECIPES = RECIPES.filter(r => r.id !== selectedModal.id);
+
+  // Close modal and refresh search
+  closeModal();
+  search();
 }
 
 function closeModal() {
@@ -623,6 +657,7 @@ addRecipeModal.addEventListener('click', e => {
 });
 
 editBtn.addEventListener('click', () => setEditMode(true));
+deleteBtn.addEventListener('click', deleteRecipe);
 cancelBtn.addEventListener('click', () => setEditMode(false));
 saveBtn.addEventListener('click', saveRecipe);
 

@@ -441,6 +441,14 @@ body {
 #saveBtn:hover {
   background: rgba(110,231,183,0.2);
 }
+.delete-btn {
+  color: #fca5a5;
+}
+.delete-btn:hover {
+  background: rgba(252,165,165,0.12);
+  color: #f87171;
+  border-color: rgba(252,165,165,0.3);
+}
 
 .modal-ingredients {
   list-style: none;
