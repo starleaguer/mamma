@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오짱이네 레시피 검색 🍱</title>
+  <meta name="description" content="재료만 입력하면 아이에게 딱 맞는 유아식 레시피를 바로 찾아드려요." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="hero">
+      <div class="hero-icon">🍚</div>
+      <h1>오짱이네 레시피 검색</h1>
+      <p class="hero-subtitle">냉장고 속 재료를 입력하면<br />아이에게 딱 맞는 요리를 찾아드려요 ✨</p>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-box">
+        <div class="input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="재료를 입력하세요 (예: 당근, 두부, 삼겹살)" autocomplete="off" />
+          <button id="clearBtn" class="clear-btn" aria-label="지우기">✕</button>
+        </div>
+        <div class="search-actions">
+          <button id="searchBtn" class="search-btn">검색하기</button>
+          <button id="addRecipeBtn" class="add-btn" title="새 레시피 등록">
+            <span class="add-icon">+</span>
+            <span class="add-text">레시피 등록</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tag Suggestions -->
+      <div class="tag-section">
+        <span class="tag-label">자주 쓰는 재료</span>
+        <div class="tags" id="popularTags">
+          <button class="tag" data-value="당근">🥕 당근</button>
+          <button class="tag" data-value="감자">🥔 감자</button>
+          <button class="tag" data-value="두부">두부</button>
+          <button class="tag" data-value="달걀">🥚 달걀</button>
+          <button class="tag" data-value="닭고기">🍗 닭고기</button>
+          <button class="tag" data-value="쌀">🌾 쌀</button>
+          <button class="tag" data-value="브로콜리">🥦 브로콜리</button>
+          <button class="tag" data-value="소고기">🥩 소고기</button>
+          <button class="tag" data-value="시금치">시금치</button>
+          <button class="tag" data-value="고구마">고구마</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection">
+      <div id="resultsHeader" class="results-header hidden">
+        <h2 id="resultsTitle"></h2>
+        <span id="resultsCount" class="results-count"></span>
+      </div>
+      <div id="recipeGrid" class="recipe-grid"></div>
+      <div id="emptyState" class="empty-state hidden">
+        <div class="empty-icon">😢</div>
+        <p>해당 재료로 만들 수 있는 유아식을 찾지 못했어요.</p>
+        <p class="empty-sub">다른 재료를 입력해 보세요!</p>
+      </div>
+      <div id="initialState" class="initial-state">
+        <div class="initial-icon">👶</div>
+        <p>재료를 검색하면<br />맞춤 유아식 메뉴가 나타나요!</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Recipe Modal -->
+  <div id="recipeModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="modal-emoji" id="modalEmoji"></div>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <div class="modal-badges" id="modalBadges"></div>
+      <div class="modal-section">
+        <h3>재료</h3>
+        <ul class="modal-ingredients" id="modalIngredients"></ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-header">
+          <h3>조리 방법</h3>
+          <div class="modal-actions">
+            <button id="editBtn" class="action-btn">✏️ 수정</button>
+            <button id="saveBtn" class="action-btn hidden">💾 저장</button>
+            <button id="cancelBtn" class="action-btn hidden">✕ 취소</button>
+          </div>
+        </div>
+        <ol class="modal-steps" id="modalSteps"></ol>
+        <textarea id="modalStepsEdit" class="modal-steps-edit hidden" placeholder="조리 방법을 한 줄씩 입력하세요."></textarea>
+      </div>
+      <div class="modal-tip" id="modalTip"></div>
+    </div>
+  </div>
+
+  <!-- Add Recipe Modal -->
+  <div id="addRecipeModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="addModalClose">✕</button>
+      <h2 class="modal-title">새 레시피 등록 🍳</h2>
+      <p class="modal-subtitle">나만의 특별한 유아식 메뉴를 추가해보세요.</p>
+
+      <form id="addRecipeForm" class="add-form">
+        <div class="form-group row">
+          <div class="field">
+            <label for="newName">메뉴명 *</label>
+            <input type="text" id="newName" placeholder="예: 단호박 퓨레" required />
+          </div>
+          <div class="field narrow">
+            <label for="newEmoji">아이콘</label>
+            <input type="text" id="newEmoji" placeholder="🍱" maxlength="2" />
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="field">
+            <label for="newAge">권장 나이</label>
+            <input type="text" id="newAge" placeholder="예: 6개월+" />
+          </div>
+          <div class="field">
+            <label for="newTime">소요 시간</label>
+            <input type="text" id="newTime" placeholder="예: 20분" />
+          </div>
+          <div class="field">
+            <label for="newDifficulty">난이도</label>
+            <select id="newDifficulty">
+              <option value="쉬움">쉬움</option>
+              <option value="보통" selected>보통</option>
+              <option value="어려움">어려움</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newIngredients">주요 재료 (쉼표로 구분) *</label>
+          <input type="text" id="newIngredients" placeholder="예: 단호박, 우유, 꿀" required />
+        </div>
+
+        <div class="form-group">
+          <label for="newDescription">한 줄 설명</label>
+          <input type="text" id="newDescription" placeholder="예: 달콤하고 부드러운 영양 간식" />
+        </div>
+
+        <div class="form-group">
+          <label for="newSteps">조리 방법 (한 단계씩 줄바꿈으로 입력) *</label>
+          <textarea id="newSteps" placeholder="1. 단호박을 쪄서 으깹니다.&#10;2. 우유를 넣고 저어주세요." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="newTip">꿀팁 한마디</label>
+          <input type="text" id="newTip" placeholder="예: 꿀은 돌 이후 아기에게만 넣어주세요." />
+        </div>
+
+        <div class="form-footer">
+          <button type="button" class="action-btn large" id="addModalCancel">취소</button>
+          <button type="submit" class="search-btn">저장하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
