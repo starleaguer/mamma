@@ -117,6 +117,8 @@ body {
 .search-icon { font-size: 1.1rem; flex-shrink: 0; }
 #searchInput {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   background: transparent;
   border: none;
   outline: none;
