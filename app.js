@@ -436,6 +436,7 @@ function createCard(recipe, matchedKeywords, idx) {
   }).join('');
 
   div.innerHTML = `
+    <span style="position:absolute; top:1rem; right:1rem; font-size:0.72rem; background:rgba(255,179,71,0.15); color:var(--accent2); border:1px solid rgba(255,179,71,0.3); padding:0.2rem 0.6rem; border-radius:50px; font-weight:500;">⭐ ${recipe.difficulty}</span>
     <span class="card-emoji">${recipe.emoji}</span>
     <div class="card-name">${recipe.name}</div>
     <div class="card-desc">${recipe.description}</div>
