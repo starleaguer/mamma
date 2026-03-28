@@ -436,7 +436,6 @@ function createCard(recipe, matchedKeywords, idx) {
   }).join('');
 
   div.innerHTML = `
-    <span class="card-age">${recipe.age}</span>
     <span class="card-emoji">${recipe.emoji}</span>
     <div class="card-name">${recipe.name}</div>
     <div class="card-desc">${recipe.description}</div>
@@ -455,8 +454,6 @@ function openModal(recipe, matchedKeywords) {
   document.getElementById('modalTitle').textContent = recipe.name;
 
   document.getElementById('modalBadges').innerHTML = `
-    <span class="modal-badge badge-age">👶 ${recipe.age}</span>
-    <span class="modal-badge badge-time">⏱ ${recipe.time}</span>
     <span class="modal-badge badge-diff">⭐ ${recipe.difficulty}</span>
   `;
 
@@ -483,8 +480,6 @@ function openEditForm() {
   // Fill the form
   document.getElementById('newName').value = selectedModal.name;
   document.getElementById('newEmoji').value = selectedModal.emoji;
-  document.getElementById('newAge').value = selectedModal.age;
-  document.getElementById('newTime').value = selectedModal.time;
   document.getElementById('newDifficulty').value = selectedModal.difficulty;
   document.getElementById('newIngredients').value = selectedModal.ingredients.join(', ');
   document.getElementById('newDescription').value = selectedModal.description;
@@ -585,8 +580,6 @@ async function handleAddRecipe(e) {
 
   const name = document.getElementById('newName').value.trim();
   const emoji = document.getElementById('newEmoji').value.trim() || '🍱';
-  const age = document.getElementById('newAge').value.trim() || '전체관람가';
-  const time = document.getElementById('newTime').value.trim() || '미지정';
   const difficulty = document.getElementById('newDifficulty').value;
   const ingredientsStr = document.getElementById('newIngredients').value.trim();
   const description = document.getElementById('newDescription').value.trim() || '새로운 유아식 메뉴입니다.';
@@ -604,8 +597,6 @@ async function handleAddRecipe(e) {
   const recipeData = {
     emoji,
     name,
-    age,
-    time,
     difficulty,
     ingredients,
     description,
