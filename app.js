@@ -435,8 +435,15 @@ function createCard(recipe, matchedKeywords, idx) {
     return `<span class="card-tag ${isMatch ? 'matched' : 'normal'}">${ing}</span>`;
   }).join('');
 
+  let diffBg = 'rgba(255,215,0,0.15)', diffColor = '#ffd700', diffBorder = 'rgba(255,215,0,0.3)'; // 보통 (노랑)
+  if (recipe.difficulty === '쉬움') {
+    diffBg = 'rgba(255,255,255,0.1)'; diffColor = '#ffffff'; diffBorder = 'rgba(255,255,255,0.3)'; // 흰색
+  } else if (recipe.difficulty === '어려움') {
+    diffBg = 'rgba(255,99,71,0.15)'; diffColor = '#ff6347'; diffBorder = 'rgba(255,99,71,0.3)'; // 빨강
+  }
+
   div.innerHTML = `
-    <span style="position:absolute; top:1rem; right:1rem; font-size:0.72rem; background:rgba(255,179,71,0.15); color:var(--accent2); border:1px solid rgba(255,179,71,0.3); padding:0.2rem 0.6rem; border-radius:50px; font-weight:500;">⭐ ${recipe.difficulty}</span>
+    <span style="position:absolute; top:1rem; right:1rem; font-size:0.72rem; background:${diffBg}; color:${diffColor}; border:1px solid ${diffBorder}; padding:0.2rem 0.6rem; border-radius:50px; font-weight:500;">⭐ ${recipe.difficulty}</span>
     <span class="card-emoji">${recipe.emoji}</span>
     <div class="card-name">${recipe.name}</div>
     <div class="card-desc">${recipe.description}</div>
@@ -454,8 +461,15 @@ function openModal(recipe, matchedKeywords) {
   document.getElementById('modalEmoji').textContent = recipe.emoji;
   document.getElementById('modalTitle').textContent = recipe.name;
 
+  let diffBg = 'rgba(255,215,0,0.15)', diffColor = '#ffd700', diffBorder = 'rgba(255,215,0,0.3)'; // 보통
+  if (recipe.difficulty === '쉬움') {
+    diffBg = 'rgba(255,255,255,0.1)'; diffColor = '#ffffff'; diffBorder = 'rgba(255,255,255,0.3)'; // 쉬움
+  } else if (recipe.difficulty === '어려움') {
+    diffBg = 'rgba(255,99,71,0.15)'; diffColor = '#ff6347'; diffBorder = 'rgba(255,99,71,0.3)'; // 어려움
+  }
+
   document.getElementById('modalBadges').innerHTML = `
-    <span class="modal-badge badge-diff">⭐ ${recipe.difficulty}</span>
+    <span class="modal-badge" style="background:${diffBg}; color:${diffColor}; border:1px solid ${diffBorder};">⭐ ${recipe.difficulty}</span>
   `;
 
   document.getElementById('modalIngredients').innerHTML = recipe.ingredients.map(ing => {
