@@ -297,9 +297,26 @@ initApp();
 let currentKeywords = [];
 let selectedModal = null;
 
+const DEFAULT_TAGS = [
+  { value: '당근', label: '🥕 당근' },
+  { value: '감자', label: '🥔 감자' },
+  { value: '두부', label: '두부' },
+  { value: '달걀', label: '🥚 달걀' },
+  { value: '닭고기', label: '🍗 닭고기' },
+  { value: '쌀', label: '🌾 쌀' },
+  { value: '브로콜리', label: '🥦 브로콜리' },
+  { value: '소고기', label: '🥩 소고기' },
+  { value: '시금치', label: '시금치' },
+  { value: '고구마', label: '고구마' }
+];
+
+let popularTags = JSON.parse(localStorage.getItem('popularTags')) || DEFAULT_TAGS;
+let tempEditTags = [];
+
 // ===== DOM =====
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
+const viewAllBtn = document.getElementById('viewAllBtn');
 const clearBtn = document.getElementById('clearBtn');
 const recipeGrid = document.getElementById('recipeGrid');
 const resultsSection = document.getElementById('resultsSection');
@@ -326,6 +343,17 @@ const formModalSubtitle = document.getElementById('formModalSubtitle');
 const formSubmitBtn = document.getElementById('formSubmitBtn');
 
 let editingRecipeId = null;
+
+// Edit Tags Modal DOM
+const editTagsBtn = document.getElementById('editTagsBtn');
+const popularTagsContainer = document.getElementById('popularTags');
+const editTagsModal = document.getElementById('editTagsModal');
+const editTagsClose = document.getElementById('editTagsClose');
+const editTagsCancel = document.getElementById('editTagsCancel');
+const saveTagsBtn = document.getElementById('saveTagsBtn');
+const newTagInput = document.getElementById('newTagInput');
+const addTagBtn = document.getElementById('addTagBtn');
+const editTagsList = document.getElementById('editTagsList');
 
 // ===== SEARCH LOGIC =====
 function normalize(str) {
@@ -644,6 +672,16 @@ async function handleAddRecipe(e) {
 // ===== EVENT LISTENERS =====
 searchBtn.addEventListener('click', search);
 
+viewAllBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  currentKeywords = [];
+  document.querySelectorAll('#popularTags .tag').forEach(t => t.classList.remove('active'));
+  
+  // Show all recipes
+  const results = RECIPES.map(recipe => ({ recipe, matched: [] }));
+  renderResults(results, '전체 메뉴');
+});
+
 searchInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') search();
 });
@@ -682,21 +720,103 @@ document.addEventListener('keydown', e => {
 });
 
 // ===== POPULAR TAGS =====
-document.querySelectorAll('.tag').forEach(tag => {
-  tag.addEventListener('click', () => {
-    const value = tag.dataset.value;
-    const current = searchInput.value.trim();
-
-    // Toggle
-    if (tag.classList.contains('active')) {
-      tag.classList.remove('active');
-      // Remove from input
-      const parts = current.split(/[,，\s]+/).map(k => k.trim()).filter(k => k && normalize(k) !== normalize(value));
-      searchInput.value = parts.join(', ');
-    } else {
-      tag.classList.add('active');
-      searchInput.value = current ? `${current}, ${value}` : value;
+function renderMainTags() {
+  popularTagsContainer.innerHTML = '';
+  popularTags.forEach(tag => {
+    const btn = document.createElement('button');
+    btn.className = 'tag';
+    btn.dataset.value = tag.value;
+    btn.textContent = tag.label;
+    
+    // Maintain active state if it was in the input
+    if (currentKeywords.includes(normalize(tag.value))) {
+      btn.classList.add('active');
     }
-    search();
+
+    btn.addEventListener('click', () => {
+      const value = tag.value;
+      const current = searchInput.value.trim();
+
+      // Toggle
+      if (btn.classList.contains('active')) {
+        btn.classList.remove('active');
+        // Remove from input
+        const parts = current.split(/[,，\s]+/).map(k => k.trim()).filter(k => k && normalize(k) !== normalize(value));
+        searchInput.value = parts.join(', ');
+      } else {
+        btn.classList.add('active');
+        searchInput.value = current ? `${current}, ${value}` : value;
+      }
+      search();
+    });
+    
+    popularTagsContainer.appendChild(btn);
   });
+}
+
+// Initial render
+renderMainTags();
+
+// Edit Tags Logic
+function openEditTagsModal() {
+  tempEditTags = [...popularTags];
+  renderEditTags();
+  newTagInput.value = '';
+  editTagsModal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditTagsModal() {
+  editTagsModal.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function renderEditTags() {
+  editTagsList.innerHTML = '';
+  tempEditTags.forEach((tag, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'tag';
+    btn.title = '클릭하여 삭제';
+    btn.innerHTML = `${tag.label} <span style="margin-left:6px; color:#fca5a5; font-size:0.75rem;">✕</span>`;
+    btn.style.borderColor = 'rgba(252,165,165,0.3)';
+    btn.style.background = 'rgba(255,255,255,0.04)';
+    
+    btn.addEventListener('click', () => {
+      tempEditTags.splice(idx, 1);
+      renderEditTags();
+    });
+    
+    editTagsList.appendChild(btn);
+  });
+}
+
+addTagBtn.addEventListener('click', () => {
+  const val = newTagInput.value.trim();
+  if (val) {
+    // Basic label matching (just the value if no emoji included)
+    tempEditTags.push({ value: val, label: val });
+    newTagInput.value = '';
+    renderEditTags();
+  }
+});
+
+newTagInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    addTagBtn.click();
+  }
+});
+
+saveTagsBtn.addEventListener('click', () => {
+  popularTags = [...tempEditTags];
+  localStorage.setItem('popularTags', JSON.stringify(popularTags));
+  renderMainTags();
+  closeEditTagsModal();
+});
+
+editTagsBtn.addEventListener('click', openEditTagsModal);
+editTagsClose.addEventListener('click', closeEditTagsModal);
+editTagsCancel.addEventListener('click', closeEditTagsModal);
+editTagsModal.addEventListener('click', e => {
+  if (e.target === editTagsModal) closeEditTagsModal();
 });

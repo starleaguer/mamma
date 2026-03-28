@@ -38,6 +38,7 @@
           <button id="clearBtn" class="clear-btn" aria-label="지우기">✕</button>
         </div>
         <div class="search-actions">
+          <button id="viewAllBtn" class="search-btn" style="background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); box-shadow: none;">전체보기</button>
           <button id="searchBtn" class="search-btn">검색하기</button>
           <button id="addRecipeBtn" class="add-btn" title="새 레시피 등록">
             <span class="add-icon">+</span>
@@ -48,18 +49,12 @@
 
       <!-- Tag Suggestions -->
       <div class="tag-section">
-        <span class="tag-label">자주 쓰는 재료</span>
+        <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <span class="tag-label">자주 쓰는 재료</span>
+          <button id="editTagsBtn" class="action-btn" title="재료 수정" style="padding: 0.1rem 0.4rem; font-size: 0.7rem;">⚙️</button>
+        </div>
         <div class="tags" id="popularTags">
-          <button class="tag" data-value="당근">🥕 당근</button>
-          <button class="tag" data-value="감자">🥔 감자</button>
-          <button class="tag" data-value="두부">두부</button>
-          <button class="tag" data-value="달걀">🥚 달걀</button>
-          <button class="tag" data-value="닭고기">🍗 닭고기</button>
-          <button class="tag" data-value="쌀">🌾 쌀</button>
-          <button class="tag" data-value="브로콜리">🥦 브로콜리</button>
-          <button class="tag" data-value="소고기">🥩 소고기</button>
-          <button class="tag" data-value="시금치">시금치</button>
-          <button class="tag" data-value="고구마">고구마</button>
+          <!-- Tags will be rendered here dynamically -->
         </div>
       </div>
     </section>
@@ -171,6 +166,31 @@
           <button type="submit" class="search-btn" id="formSubmitBtn">저장하기</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Edit Tags Modal -->
+  <div id="editTagsModal" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 440px;">
+      <button class="modal-close" id="editTagsClose">✕</button>
+      <h2 class="modal-title">자주 쓰는 재료 수정 ⚙️</h2>
+      <p class="modal-subtitle">클릭해서 삭제하거나 새 재료를 추가하세요.</p>
+
+      <div class="form-group row" style="margin-bottom: 1.5rem;">
+        <div class="field">
+          <input type="text" id="newTagInput" placeholder="새 재료 입력 (예: 소고기)" />
+        </div>
+        <button type="button" id="addTagBtn" style="padding: 0 1.2rem; border-radius: 12px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--border); font-weight: 700; cursor: pointer; transition: all 0.2s;">추가</button>
+      </div>
+
+      <div class="tags" id="editTagsList" style="margin-bottom: 2rem;">
+        <!-- Editable Tags will be populated here -->
+      </div>
+
+      <div class="form-footer">
+        <button type="button" class="action-btn large" id="editTagsCancel">취소</button>
+        <button type="button" class="search-btn" id="saveTagsBtn">저장하기</button>
+      </div>
     </div>
   </div>
 

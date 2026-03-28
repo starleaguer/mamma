@@ -5,3 +5,6 @@ supabase
 python-dotenv
 opencv-python
 easyocr
+open-clip-torch
+torch
+torchvision
