@@ -391,14 +391,24 @@ body {
 }
 .modal-close {
   position: absolute; top: 1.2rem; right: 1.2rem;
-  background: rgba(255,255,255,0.08); border: none;
-  color: var(--text-sub); font-size: 1rem;
-  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 1.1rem;
+  width: 40px; height: 40px; border-radius: 50%;
   cursor: pointer; transition: all var(--transition);
   display: flex; align-items: center; justify-content: center;
   z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
-.modal-close:hover { background: rgba(255,124,92,0.2); color: var(--accent1); }
+.modal-close:hover { 
+  background: var(--accent1); 
+  color: #fff; 
+  transform: rotate(90deg);
+  border-color: transparent;
+}
 .modal-hero {
   position: relative;
   width: calc(100% + 4rem);
