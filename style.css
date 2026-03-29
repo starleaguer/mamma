@@ -237,6 +237,36 @@ body {
   overflow: hidden;
   backdrop-filter: blur(10px);
   animation: cardIn 0.4s ease both;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-image-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0.6;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--transition);
+}
+
+.recipe-card:hover .card-image-wrapper img {
+  transform: scale(1.1);
+}
+
+.recipe-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgba(13, 15, 26, 0.85) 90%);
+  z-index: 1;
 }
 .recipe-card::before {
   content: '';
@@ -261,27 +291,30 @@ body {
 }
 
 .card-emoji {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   display: block;
   margin-bottom: 0.8rem;
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .card-name {
   font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 0.4rem;
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 .card-desc {
   font-size: 0.82rem;
   color: var(--text-sub);
   line-height: 1.5;
   margin-bottom: 0.9rem;
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
+  font-weight: 500;
 }
 .card-tags {
   display: flex; flex-wrap: wrap; gap: 0.4rem;
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
 }
 .card-tag {
   font-size: 0.73rem;
@@ -358,9 +391,38 @@ body {
   display: flex; align-items: center; justify-content: center;
 }
 .modal-close:hover { background: rgba(255,124,92,0.2); color: var(--accent1); }
+.modal-hero {
+  position: relative;
+  width: calc(100% + 4rem);
+  margin: -2.5rem -2rem 1.5rem;
+  height: 220px;
+  overflow: hidden;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+}
+.modal-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.modal-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, rgba(19, 21, 32, 1));
+}
+.modal-hero-emoji {
+  position: absolute;
+  bottom: -15px;
+  left: 2rem;
+  font-size: 3.5rem;
+  z-index: 5;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
 .modal-emoji { font-size: 3.5rem; margin-bottom: 0.8rem; }
-.modal-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 0.4rem; }
-.modal-subtitle { font-size: 0.88rem; color: var(--text-sub); margin-bottom: 2rem; }
+.modal-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 0.4rem; z-index: 2; position: relative; }
+.modal-subtitle { font-size: 0.88rem; color: var(--text-sub); margin-bottom: 2rem; z-index: 2; position: relative; }
 
 /* ===== FORM ===== */
 .add-form { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -389,6 +451,21 @@ body {
   background: rgba(255,255,255,0.08);
 }
 .form-group textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+
+.image-input-wrapper { display: flex; flex-direction: column; gap: 0.8rem; }
+.image-preview {
+  width: 100%;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px dashed var(--border);
+  background: rgba(255,255,255,0.02);
+}
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .form-footer {
   display: flex; justify-content: flex-end; gap: 1rem;

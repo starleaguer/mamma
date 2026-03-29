@@ -82,7 +82,11 @@
   <div id="recipeModal" class="modal-overlay hidden">
     <div class="modal-card">
       <button class="modal-close" id="modalClose">✕</button>
-      <div class="modal-emoji" id="modalEmoji"></div>
+      <div id="modalHero" class="modal-hero hidden">
+        <img id="modalImage" src="" alt="요리 사진" />
+        <div class="modal-hero-emoji" id="modalEmoji"></div>
+      </div>
+      <div id="modalNoHero" class="modal-emoji"></div>
       <h2 class="modal-title" id="modalTitle"></h2>
       <div class="modal-badges" id="modalBadges"></div>
       <div class="modal-section">
@@ -136,6 +140,16 @@
         <div class="form-group">
           <label for="newIngredients">주요 재료 (쉼표로 구분) *</label>
           <input type="text" id="newIngredients" placeholder="예: 단호박, 우유, 꿀" required />
+        </div>
+
+        <div class="form-group">
+          <label for="newImageUrl">요리 사진 URL (선택)</label>
+          <div class="image-input-wrapper">
+            <input type="url" id="newImageUrl" placeholder="https://example.com/food.jpg" />
+            <div id="imagePreview" class="image-preview hidden">
+              <img id="previewImg" src="" alt="미리보기" />
+            </div>
+          </div>
         </div>
 
         <div class="form-group">

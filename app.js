@@ -433,6 +433,16 @@ function createCard(recipe, matchedKeywords, idx) {
   div.setAttribute('tabindex', '0');
   div.setAttribute('aria-label', recipe.name + ' 레시피 보기');
   div.dataset.recipeId = String(recipe.id);
+  
+  // Image Background if exists
+  let imageHTML = '';
+  if (recipe.image_url) {
+    imageHTML = `
+      <div class="card-image-wrapper">
+        <img src="${recipe.image_url}" alt="${recipe.name}" onerror="this.parentElement.style.display='none'" />
+      </div>
+    `;
+  }
 
   const tagHTML = recipe.ingredients.map(ing => {
     const isMatch = matchedKeywords.some(kw =>
@@ -449,7 +459,8 @@ function createCard(recipe, matchedKeywords, idx) {
   }
 
   div.innerHTML = `
-    <span style="position:absolute; top:1rem; right:1rem; font-size:0.72rem; background:${diffBg}; color:${diffColor}; border:1px solid ${diffBorder}; padding:0.2rem 0.6rem; border-radius:50px; font-weight:500;">⭐ ${recipe.difficulty}</span>
+    ${imageHTML}
+    <span style="position:absolute; top:1rem; right:1rem; font-size:0.72rem; background:${diffBg}; color:${diffColor}; border:1px solid ${diffBorder}; padding:0.2rem 0.6rem; border-radius:50px; font-weight:500; z-index:3;">⭐ ${recipe.difficulty}</span>
     <span class="card-emoji">${recipe.emoji}</span>
     <div class="card-name">${recipe.name}</div>
     <div class="card-desc">${recipe.description}</div>
@@ -464,7 +475,24 @@ function createCard(recipe, matchedKeywords, idx) {
 // ===== MODAL =====
 function openModal(recipe, matchedKeywords) {
   selectedModal = recipe;
-  document.getElementById('modalEmoji').textContent = recipe.emoji;
+  
+  const modalHero = document.getElementById('modalHero');
+  const modalNoHero = document.getElementById('modalNoHero');
+  const modalImage = document.getElementById('modalImage');
+  const modalEmoji = document.getElementById('modalEmoji');
+  const modalEmojiDefault = document.getElementById('modalNoHero');
+
+  if (recipe.image_url) {
+    modalHero.classList.remove('hidden');
+    modalNoHero.classList.add('hidden');
+    modalImage.src = recipe.image_url;
+    modalEmoji.textContent = recipe.emoji;
+  } else {
+    modalHero.classList.add('hidden');
+    modalNoHero.classList.remove('hidden');
+    modalNoHero.textContent = recipe.emoji;
+  }
+
   document.getElementById('modalTitle').textContent = recipe.name;
 
   let diffBg = 'rgba(255,215,0,0.15)', diffColor = '#ffd700', diffBorder = 'rgba(255,215,0,0.3)'; // 보통
@@ -503,9 +531,18 @@ function openEditForm() {
   document.getElementById('newEmoji').value = selectedModal.emoji;
   document.getElementById('newDifficulty').value = selectedModal.difficulty;
   document.getElementById('newIngredients').value = selectedModal.ingredients.join(', ');
+  document.getElementById('newImageUrl').value = selectedModal.image_url || '';
   document.getElementById('newDescription').value = selectedModal.description;
   document.getElementById('newSteps').value = selectedModal.steps.join('\n');
   document.getElementById('newTip').value = selectedModal.tip;
+  
+  // Trigger preview
+  if (selectedModal.image_url) {
+    document.getElementById('imagePreview').classList.remove('hidden');
+    document.getElementById('previewImg').src = selectedModal.image_url;
+  } else {
+    document.getElementById('imagePreview').classList.add('hidden');
+  }
 
   // Change texts
   formModalTitle.textContent = '레시피 수정 ✏️';
@@ -583,6 +620,7 @@ function closeModal() {
 function openAddModal() {
   editingRecipeId = null;
   addRecipeForm.reset();
+  document.getElementById('imagePreview').classList.add('hidden');
   formModalTitle.textContent = '새 레시피 등록 🍳';
   formModalSubtitle.textContent = '나만의 특별한 유아식 메뉴를 추가해보세요.';
   formSubmitBtn.textContent = '저장하기';
@@ -603,6 +641,7 @@ async function handleAddRecipe(e) {
   const emoji = document.getElementById('newEmoji').value.trim() || '🍱';
   const difficulty = document.getElementById('newDifficulty').value;
   const ingredientsStr = document.getElementById('newIngredients').value.trim();
+  const imageUrl = document.getElementById('newImageUrl').value.trim();
   const description = document.getElementById('newDescription').value.trim() || '새로운 유아식 메뉴입니다.';
   const stepsStr = document.getElementById('newSteps').value.trim();
   const tip = document.getElementById('newTip').value.trim() || '아이의 기호에 맞게 조절해주세요.';
@@ -620,6 +659,7 @@ async function handleAddRecipe(e) {
     name,
     difficulty,
     ingredients,
+    image_url: imageUrl,
     description,
     steps,
     tip
@@ -727,8 +767,19 @@ deleteBtn.addEventListener('click', deleteRecipe);
 recipeModal.addEventListener('click', e => {
   if (e.target === recipeModal) closeModal();
 });
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && selectedModal) closeModal();
+// Image Preview Listener
+document.getElementById('newImageUrl').addEventListener('input', (e) => {
+  const url = e.target.value.trim();
+  const preview = document.getElementById('imagePreview');
+  const img = document.getElementById('previewImg');
+  
+  if (url) {
+    img.src = url;
+    preview.classList.remove('hidden');
+    img.onerror = () => preview.classList.add('hidden');
+  } else {
+    preview.classList.add('hidden');
+  }
 });
 
 // ===== POPULAR TAGS =====

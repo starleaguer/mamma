@@ -8,3 +8,4 @@ easyocr
 open-clip-torch
 torch
 torchvision
+google-genai
