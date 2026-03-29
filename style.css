@@ -243,11 +243,16 @@ body {
 
 .card-image-wrapper {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 65%;
   z-index: 0;
   overflow: hidden;
   border-radius: inherit;
-  opacity: 0.6;
+  opacity: 0.8;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 50%);
+  mask-image: linear-gradient(to right, transparent, black 50%);
 }
 
 .card-image-wrapper img {
@@ -265,7 +270,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 30%, rgba(13, 15, 26, 0.85) 90%);
+  background: linear-gradient(to right, rgba(13, 15, 26, 0.95) 30%, transparent 80%);
   z-index: 1;
 }
 .recipe-card::before {
@@ -303,6 +308,7 @@ body {
   margin-bottom: 0.4rem;
   position: relative; z-index: 2;
   text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  max-width: 65%;
 }
 .card-desc {
   font-size: 0.82rem;
@@ -311,6 +317,7 @@ body {
   margin-bottom: 0.9rem;
   position: relative; z-index: 2;
   font-weight: 500;
+  max-width: 65%;
 }
 .card-tags {
   display: flex; flex-wrap: wrap; gap: 0.4rem;
