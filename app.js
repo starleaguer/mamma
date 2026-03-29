@@ -362,14 +362,20 @@ function normalize(str) {
 
 function matchRecipe(recipe, keywords) {
   const matched = [];
+  const normalizedName = normalize(recipe.name);
+
   for (const kw of keywords) {
     const n = normalize(kw);
     if (!n) continue;
-    for (const ing of recipe.ingredients) {
-      if (normalize(ing).includes(n) || n.includes(normalize(ing))) {
-        matched.push(kw);
-        break;
-      }
+
+    // Check Name OR Ingredients
+    const isNameMatch = normalizedName.includes(n) || n.includes(normalizedName);
+    const isIngredientMatch = recipe.ingredients.some(ing => 
+      normalize(ing).includes(n) || n.includes(normalize(ing))
+    );
+
+    if (isNameMatch || isIngredientMatch) {
+      matched.push(kw);
     }
   }
   return matched;
