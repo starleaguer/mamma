@@ -392,13 +392,13 @@ function search() {
   const results = [];
   for (const recipe of RECIPES) {
     const matched = matchRecipe(recipe, keywords);
-    if (matched.length > 0) {
+    if (matched.length === keywords.length) {
       results.push({ recipe, matched });
     }
   }
 
-  // Sort by number of matched ingredients (desc)
-  results.sort((a, b) => b.matched.length - a.matched.length);
+  // Sort by name (since matched length is now all the same)
+  results.sort((a, b) => a.recipe.name.localeCompare(b.recipe.name));
 
   renderResults(results, raw);
 }
