@@ -34,7 +34,7 @@ body {
 }
 
 /* ===== ANIMATED BLOBS ===== */
-.bg-blobs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; max-width: 100vw; }
+.bg-blobs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; max-width: 100%; }
 
 .blob {
   position: absolute;
@@ -627,4 +627,10 @@ body {
 
   /* 텍스트 줄바꿈 강제 */
   .modal-tip, .modal-steps li, .card-desc { word-break: keep-all; overflow-wrap: break-word; }
+
+  /* 모바일 히어로 마진 조정 (패딩 1.2rem에 비례) */
+  .modal-hero {
+    width: calc(100% + 2.4rem);
+    margin: -2rem -1.2rem 1.5rem;
+  }
 }
