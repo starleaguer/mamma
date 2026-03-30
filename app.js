@@ -255,6 +255,13 @@ const SUPABASE_URL = 'https://nvraninnkutvebdgnlfv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cmFuaW5ua3V0dmViZGdubGZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNTgzMDcsImV4cCI6MjA4OTkzNDMwN30.wH1ewf0ArHsOTeulFdhAcHrWM18_Fh9SooSJtUNCYUI';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Helper to normalize image URLs by removing the base URL
+const BASE_URL = 'https://mamma-blond.vercel.app';
+function normalizeImageUrl(url) {
+  if (!url) return '';
+  return url.replace(BASE_URL, '').trim();
+}
+
 // Global State for Recipes
 let RECIPES = [];
 
@@ -447,9 +454,10 @@ function createCard(recipe, matchedKeywords, idx) {
   // Image Background if exists
   let imageHTML = '';
   if (recipe.image_url) {
+    const displayUrl = normalizeImageUrl(recipe.image_url);
     imageHTML = `
       <div class="card-image-wrapper">
-        <img src="${recipe.image_url}" alt="${recipe.name}" onerror="this.parentElement.style.display='none'" />
+        <img src="${displayUrl}" alt="${recipe.name}" onerror="this.parentElement.style.display='none'" />
       </div>
     `;
   }
@@ -493,9 +501,10 @@ function openModal(recipe, matchedKeywords) {
   const modalEmojiDefault = document.getElementById('modalNoHero');
 
   if (recipe.image_url) {
+    const displayUrl = normalizeImageUrl(recipe.image_url);
     modalHero.classList.remove('hidden');
     modalNoHero.classList.add('hidden');
-    modalImage.src = recipe.image_url;
+    modalImage.src = displayUrl;
     modalEmoji.textContent = recipe.emoji;
   } else {
     modalHero.classList.add('hidden');
@@ -541,7 +550,7 @@ function openEditForm() {
   document.getElementById('newEmoji').value = selectedModal.emoji;
   document.getElementById('newDifficulty').value = selectedModal.difficulty;
   document.getElementById('newIngredients').value = selectedModal.ingredients.join(', ');
-  document.getElementById('newImageUrl').value = selectedModal.image_url || '';
+  document.getElementById('newImageUrl').value = normalizeImageUrl(selectedModal.image_url);
   document.getElementById('newDescription').value = selectedModal.description;
   document.getElementById('newSteps').value = selectedModal.steps.join('\n');
   document.getElementById('newTip').value = selectedModal.tip;
@@ -549,7 +558,7 @@ function openEditForm() {
   // Trigger preview
   if (selectedModal.image_url) {
     document.getElementById('imagePreview').classList.remove('hidden');
-    document.getElementById('previewImg').src = selectedModal.image_url;
+    document.getElementById('previewImg').src = normalizeImageUrl(selectedModal.image_url);
   } else {
     document.getElementById('imagePreview').classList.add('hidden');
   }
@@ -651,7 +660,7 @@ async function handleAddRecipe(e) {
   const emoji = document.getElementById('newEmoji').value.trim() || '🍱';
   const difficulty = document.getElementById('newDifficulty').value;
   const ingredientsStr = document.getElementById('newIngredients').value.trim();
-  const imageUrl = document.getElementById('newImageUrl').value.trim();
+  const imageUrl = normalizeImageUrl(document.getElementById('newImageUrl').value);
   const description = document.getElementById('newDescription').value.trim() || '새로운 유아식 메뉴입니다.';
   const stepsStr = document.getElementById('newSteps').value.trim();
   const tip = document.getElementById('newTip').value.trim() || '아이의 기호에 맞게 조절해주세요.';
@@ -779,7 +788,7 @@ recipeModal.addEventListener('click', e => {
 });
 // Image Preview Listener
 document.getElementById('newImageUrl').addEventListener('input', (e) => {
-  const url = e.target.value.trim();
+  const url = normalizeImageUrl(e.target.value);
   const preview = document.getElementById('imagePreview');
   const img = document.getElementById('previewImg');
   
