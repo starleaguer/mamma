@@ -383,7 +383,17 @@ function matchRecipe(recipe, keywords) {
 
 function search() {
   const raw = searchInput.value.trim();
-  if (!raw) return;
+  
+  if (!raw) {
+    // If input is empty, reset to initial state
+    currentKeywords = [];
+    recipeGrid.innerHTML = '';
+    resultsHeader.classList.add('hidden');
+    emptyState.classList.add('hidden');
+    initialState.classList.remove('hidden');
+    syncTagsWithInput();
+    return;
+  }
 
   // Parse comma-separated keywords
   const keywords = raw.split(/[,，\s]+/).map(k => k.trim()).filter(Boolean);
@@ -799,17 +809,27 @@ function renderMainTags() {
     btn.addEventListener('click', () => {
       const value = tag.value;
       const current = searchInput.value.trim();
+      const normalizedValue = normalize(value);
+      
+      // Parse current keywords to check if already present
+      let parts = current.split(/[,，\s]+/).map(k => k.trim()).filter(Boolean);
+      const isAlreadyIncluded = parts.some(p => normalize(p) === normalizedValue);
 
-      // Toggle
-      if (btn.classList.contains('active')) {
-        btn.classList.remove('active');
-        // Remove from input
-        const parts = current.split(/[,，\s]+/).map(k => k.trim()).filter(k => k && normalize(k) !== normalize(value));
+      if (isAlreadyIncluded) {
+        // Remove it
+        parts = parts.filter(p => normalize(p) !== normalizedValue);
         searchInput.value = parts.join(', ');
       } else {
-        btn.classList.add('active');
-        searchInput.value = current ? `${current}, ${value}` : value;
+        // Add it
+        if (current) {
+          searchInput.value = `${current}, ${value}`;
+        } else {
+          searchInput.value = value;
+        }
       }
+      
+      // Sync all tags' visual state and trigger search
+      syncTagsWithInput();
       search();
     });
     
@@ -817,8 +837,27 @@ function renderMainTags() {
   });
 }
 
+// Helper to sync tag buttons with search input
+function syncTagsWithInput() {
+  const raw = searchInput.value.trim();
+  const keywords = raw.split(/[,，\s]+/).map(k => normalize(k)).filter(Boolean);
+  
+  const tagButtons = popularTagsContainer.querySelectorAll('.tag');
+  tagButtons.forEach(btn => {
+    const val = normalize(btn.dataset.value);
+    if (keywords.includes(val)) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+
 // Initial render
 renderMainTags();
+
+// Add input listener for real-time tag syncing while typing
+searchInput.addEventListener('input', syncTagsWithInput);
 
 // Edit Tags Logic
 function openEditTagsModal() {
