@@ -40,7 +40,8 @@
           </div>
         </div>
         <div class="search-actions">
-          <button id="viewAllBtn" class="search-btn" style="background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); box-shadow: none;">전체메뉴</button>
+          <button id="viewAllBtn" class="search-btn"
+            style="background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); box-shadow: none;">전체메뉴보기</button>
           <button id="addRecipeBtn" class="add-btn" title="새 레시피 등록">
             <span class="add-icon">+</span>
             <span class="add-text">레시피 등록</span>
@@ -52,7 +53,8 @@
       <div class="tag-section">
         <div style="display: flex; align-items: center; gap: 0.4rem;">
           <span class="tag-label">자주 쓰는 재료</span>
-          <button id="editTagsBtn" class="action-btn" title="재료 수정" style="padding: 0.1rem 0.4rem; font-size: 0.7rem;">⚙️</button>
+          <button id="editTagsBtn" class="action-btn" title="재료 수정"
+            style="padding: 0.1rem 0.4rem; font-size: 0.7rem;">⚙️</button>
         </div>
         <div class="tags" id="popularTags">
           <!-- Tags will be rendered here dynamically -->
@@ -183,11 +185,11 @@
       <h2 class="modal-title">자주 쓰는 재료 수정 ⚙️</h2>
       <p class="modal-subtitle">클릭해서 삭제하거나 새 재료를 추가하세요.</p>
 
-      <div class="form-group row no-stack" style="margin-bottom: 1.5rem;">
-        <div class="field">
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <div class="input-with-button">
           <input type="text" id="newTagInput" placeholder="새 재료 입력 (예: 소고기)" />
+          <button type="button" id="addTagBtn" class="inner-btn">추가</button>
         </div>
-        <button type="button" id="addTagBtn" style="padding: 0 1.2rem; border-radius: 12px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--border); font-weight: 700; cursor: pointer; transition: all 0.2s;">추가</button>
       </div>
 
       <div class="tags" id="editTagsList" style="margin-bottom: 2rem;">

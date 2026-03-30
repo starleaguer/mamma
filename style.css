@@ -629,7 +629,7 @@ body {
   position: relative;
   width: calc(100% + 4rem);
   margin: -2.5rem -2rem 1.5rem;
-  height: 260px;
+  height: 220px;
   overflow: hidden;
   border-top-left-radius: 28px;
   border-top-right-radius: 28px;
@@ -739,6 +739,47 @@ body {
   min-height: 120px;
   resize: vertical;
   line-height: 1.6;
+}
+
+
+.input-with-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-with-button input {
+  padding-right: 4.5rem !important;
+}
+
+.input-with-button .inner-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: calc(100% - 12px);
+  padding: 0 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.input-with-button .inner-btn:hover {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  transform: translateY(-50%) scale(1.02);
 }
 
 .image-input-wrapper {
@@ -1010,6 +1051,12 @@ body {
     overflow-x: hidden;
   }
 
+  .modal-hero {
+    width: calc(100% + 2.4rem);
+    margin: -2rem -1.2rem 1.5rem;
+    height: 120px;
+  }
+
   .recipe-grid {
     grid-template-columns: 1fr;
   }
@@ -1046,5 +1093,7 @@ body {
   .modal-hero {
     width: calc(100% + 2.4rem);
     margin: -2rem -1.2rem 1.5rem;
+    height: 120px;
+    /* Ensure height is set here too */
   }
 }
