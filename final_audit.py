@@ -13,6 +13,7 @@ def contains_invalid(text, menu_name):
     
     # 2. 물결표 포함 여부
     has_tilde = '~' in text
+    has_tilde2 = '!' in text
     
     # 3. 메뉴 이름 포함 여부 (공백 제거 후 비교)
     clean_name = menu_name.replace(" ", "")
@@ -21,7 +22,7 @@ def contains_invalid(text, menu_name):
     
     # 4. 길이 제약 (20-25자)
     length = len(text)
-    invalid_length = length < 20 or length > 25
+    invalid_length = length < 10 or length > 25
     
     # 5. 명사형 종결 여부 체크 (요, 다, 죠로 끝나면 문장형으로 간주)
     is_sentence_ending = text.strip().endswith(("요", "다", "죠"))
@@ -29,6 +30,7 @@ def contains_invalid(text, menu_name):
     reasons = []
     if has_english or has_chinese: reasons.append("외국어")
     if has_tilde: reasons.append("물결표(~)")
+    if has_tilde2: reasons.append("느낌표(!)")
     if has_menu_name: reasons.append("메뉴명 포함")
     if invalid_length: reasons.append(f"길이 부적절({length}자)")
     if is_sentence_ending: reasons.append("문장형 어미")
