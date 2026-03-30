@@ -20,6 +20,10 @@ if not all([SUPABASE_URL, SUPABASE_KEY]):
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 ai_client = OpenAI(base_url=OLLAMA_URL, api_key="ollama")
 
+def has_init_content(text, menu_name):
+    has_init = '새로운 유아식 메뉴입니다.' in text
+    return has_init
+
 def has_invalid_content(text, menu_name):
     """최종 규칙 적용: 20-25자, 명사형 종결, 메뉴명 허용(단독 사용은 금지)"""
     has_english = any('a' <= char.lower() <= 'z' for char in text)
@@ -52,10 +56,9 @@ def generate_description(name, steps):
 
 [조건]
 1. 느낌: 한국 정서적 감성으로 편안하고 감각적인 스타일. (엄마와 아기를 위한)
-2. 종결: 반드시 "명사형" 종결
-3. 금지: "~해요", "~입니다" 등 문장형 절대 금지. 마침표(.)도 금지.
-4. 길이: 공백 포함 **10자 이상 20자 이하**. (매우 엄격히 준수)
-5. 언어: 오직 한국어(한글)만 사용.
+2. 금지: "~해요", "~입니다" 등 문장형 절대 금지. 마침표(.)도 금지.
+3. 길이: 공백 포함 **10자 이상 20자 이하**. (매우 엄격히 준수)
+4. 언어: 오직 한국어(한글)만 사용.
 """
     
     for attempt in range(8):
@@ -91,7 +94,7 @@ def generate_description(name, steps):
 def main():
     print("📋 최종 광고 카피 스타일로 DB 필터링 중...")
     response = supabase.table("recipes").select("*").execute()
-    recipes = [r for r in response.data if has_invalid_content(r.get("description", ""), r.get("name", ""))]
+    recipes = [r for r in response.data if has_init_content(r.get("description", ""), r.get("name", ""))]
 
     if not recipes:
         print("✅ 모든 레시피가 최상의 광고 카피(20-25자)로 완성되었습니다.")

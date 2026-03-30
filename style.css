@@ -419,7 +419,7 @@ body {
   position: relative;
   width: calc(100% + 4rem);
   margin: -2.5rem -2rem 1.5rem;
-  height: 220px;
+  height: 180px;
   overflow: hidden;
   border-top-left-radius: 28px;
   border-top-right-radius: 28px;
