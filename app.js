@@ -764,11 +764,6 @@ async function handleAddRecipe(e) {
 }
 
 // ===== EVENT LISTENERS =====
-searchBtn.addEventListener('click', () => {
-  if (searchTimeout) clearTimeout(searchTimeout);
-  search();
-});
-
 viewAllBtn.addEventListener('click', () => {
   searchInput.value = '';
   currentKeywords = [];
