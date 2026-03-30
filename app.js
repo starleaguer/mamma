@@ -305,19 +305,31 @@ let currentKeywords = [];
 let selectedModal = null;
 
 const DEFAULT_TAGS = [
-  { value: '당근', label: '🥕 당근' },
-  { value: '감자', label: '🥔 감자' },
-  { value: '두부', label: '두부' },
+  { value: '쌀가루', label: '🌾 쌀가루' },
   { value: '달걀', label: '🥚 달걀' },
+  { value: '분유', label: '🍼 분유' },
+  { value: '고구마', label: '🍠 고구마' },
+  { value: '버터', label: '🧈 버터' },
+  { value: '양파', label: '🧅 양파' },
+  { value: '오트밀', label: '🥣 오트밀' },
+  { value: '바나나', label: '🍌 바나나' },
   { value: '닭고기', label: '🍗 닭고기' },
-  { value: '쌀', label: '🌾 쌀' },
-  { value: '브로콜리', label: '🥦 브로콜리' },
-  { value: '소고기', label: '🥩 소고기' },
-  { value: '시금치', label: '시금치' },
-  { value: '고구마', label: '고구마' }
+  { value: '시금치', label: '🥬 시금치' }
 ];
 
-let popularTags = JSON.parse(localStorage.getItem('popularTags')) || DEFAULT_TAGS;
+// Check if we need to update/reset tags to new defaults (one-time migration for old users)
+let popularTagsStored = localStorage.getItem('popularTags');
+if (popularTagsStored) {
+  const parsed = JSON.parse(popularTagsStored);
+  // Simple check: if '쌀가루' isn't the first tag, and it was '당근' before, reset it.
+  if (parsed.length > 0 && parsed[0].value === '당근') {
+    console.log('Migrating popular tags to new defaults based on DB frequency...');
+    localStorage.setItem('popularTags', JSON.stringify(DEFAULT_TAGS));
+    popularTagsStored = JSON.stringify(DEFAULT_TAGS);
+  }
+}
+
+let popularTags = popularTagsStored ? JSON.parse(popularTagsStored) : DEFAULT_TAGS;
 let tempEditTags = [];
 
 // ===== DOM =====
@@ -479,7 +491,7 @@ function createCard(recipe, matchedKeywords, idx) {
   div.innerHTML = `
     ${imageHTML}
     <span style="position:absolute; top:1rem; right:1rem; font-size:0.72rem; background:${diffBg}; color:${diffColor}; border:1px solid ${diffBorder}; padding:0.2rem 0.6rem; border-radius:50px; font-weight:500; z-index:3;">⭐ ${recipe.difficulty}</span>
-    <span class="card-emoji">${recipe.emoji}</span>
+    ${recipe.image_url ? '' : `<span class="card-emoji">${recipe.emoji}</span>`}
     <div class="card-name">${recipe.name}</div>
     <div class="card-desc">${recipe.description}</div>
     <div class="card-tags">${tagHTML}</div>
@@ -505,7 +517,7 @@ function openModal(recipe, matchedKeywords) {
     modalHero.classList.remove('hidden');
     modalNoHero.classList.add('hidden');
     modalImage.src = displayUrl;
-    modalEmoji.textContent = recipe.emoji;
+    modalEmoji.classList.add('hidden'); // Hide emoji when image exists
   } else {
     modalHero.classList.add('hidden');
     modalNoHero.classList.remove('hidden');
