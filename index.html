@@ -32,14 +32,16 @@
     <!-- Search Section -->
     <section class="search-section">
       <div class="search-box">
-        <div class="input-wrapper">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="searchInput" placeholder="소고기, 당근, 두부" autocomplete="off" />
-          <button id="clearBtn" class="clear-btn" aria-label="지우기">✕</button>
+        <div class="search-input-group">
+          <div class="input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="소고기, 당근, 두부" autocomplete="off" />
+            <button id="clearBtn" class="clear-btn" aria-label="지우기">✕</button>
+          </div>
+          <button id="searchBtn" class="search-btn" title="검색하기">🔍</button>
         </div>
         <div class="search-actions">
-          <button id="viewAllBtn" class="search-btn" style="background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); box-shadow: none;">전체보기</button>
-          <button id="searchBtn" class="search-btn">검색하기</button>
+          <button id="viewAllBtn" class="search-btn" style="background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--border); box-shadow: none;">전체메뉴</button>
           <button id="addRecipeBtn" class="add-btn" title="새 레시피 등록">
             <span class="add-icon">+</span>
             <span class="add-text">레시피 등록</span>
@@ -182,7 +184,7 @@
       <h2 class="modal-title">자주 쓰는 재료 수정 ⚙️</h2>
       <p class="modal-subtitle">클릭해서 삭제하거나 새 재료를 추가하세요.</p>
 
-      <div class="form-group row" style="margin-bottom: 1.5rem;">
+      <div class="form-group row no-stack" style="margin-bottom: 1.5rem;">
         <div class="field">
           <input type="text" id="newTagInput" placeholder="새 재료 입력 (예: 소고기)" />
         </div>
