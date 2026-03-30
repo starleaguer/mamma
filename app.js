@@ -414,22 +414,33 @@ function search() {
     return;
   }
 
-  // Parse comma-separated keywords
+  // Parse keywords: split by commas OR spaces
   const keywords = raw.split(/[,，\s]+/).map(k => k.trim()).filter(Boolean);
   currentKeywords = keywords;
 
   const results = [];
   for (const recipe of RECIPES) {
     const matched = matchRecipe(recipe, keywords);
+    // AND search: all keywords must match
     if (matched.length === keywords.length) {
       results.push({ recipe, matched });
     }
   }
 
-  // Sort by name (since matched length is now all the same)
+  // Sort by name
   results.sort((a, b) => a.recipe.name.localeCompare(b.recipe.name));
 
   renderResults(results, raw);
+  syncTagsWithInput(); // Ensure tags are updated visually
+}
+
+// Debounce helper
+let searchTimeout = null;
+function handleLiveSearch() {
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    search();
+  }, 250);
 }
 
 // ===== RENDER =====
@@ -753,7 +764,10 @@ async function handleAddRecipe(e) {
 }
 
 // ===== EVENT LISTENERS =====
-searchBtn.addEventListener('click', search);
+searchBtn.addEventListener('click', () => {
+  if (searchTimeout) clearTimeout(searchTimeout);
+  search();
+});
 
 viewAllBtn.addEventListener('click', () => {
   searchInput.value = '';
@@ -766,7 +780,10 @@ viewAllBtn.addEventListener('click', () => {
 });
 
 searchInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') search();
+  if (e.key === 'Enter') {
+    if (searchTimeout) clearTimeout(searchTimeout);
+    search();
+  }
 });
 
 clearBtn.addEventListener('click', () => {
@@ -877,8 +894,11 @@ function syncTagsWithInput() {
 // Initial render
 renderMainTags();
 
-// Add input listener for real-time tag syncing while typing
-searchInput.addEventListener('input', syncTagsWithInput);
+// Add input listener for real-time tag syncing and live search while typing
+searchInput.addEventListener('input', () => {
+  syncTagsWithInput();
+  handleLiveSearch();
+});
 
 // Edit Tags Logic
 function openEditTagsModal() {
