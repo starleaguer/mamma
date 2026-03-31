@@ -1,4 +1,9 @@
 // ===== RECIPE DATABASE =====
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js");
+}
+
 const DEFAULT_RECIPES = [
   {
     id: 1, emoji: '🍚', name: '닭고기 야채죽',
