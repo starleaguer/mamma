@@ -223,8 +223,14 @@ body {
   flex-shrink: 0;
 }
 
-.clear-btn:hover {
+.clear-btn:active {
   color: var(--accent1);
+}
+
+@media (hover: hover) {
+  .clear-btn:hover {
+    color: var(--accent1);
+  }
 }
 
 .search-input-group {
@@ -259,9 +265,16 @@ body {
   box-shadow: 0 4px 20px rgba(255, 124, 92, 0.35);
 }
 
-.search-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(255, 124, 92, 0.45);
+.search-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 4px 15px rgba(255, 124, 92, 0.25);
+}
+
+@media (hover: hover) {
+  .search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(255, 124, 92, 0.45);
+  }
 }
 
 .search-btn:active {
@@ -286,10 +299,17 @@ body {
   transition: all var(--transition);
 }
 
-.add-btn:hover {
-  background: rgba(167, 139, 250, 0.22);
-  border-color: var(--accent-purple);
-  transform: translateY(-2px);
+.add-btn:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(167, 139, 250, 0.18);
+}
+
+@media (hover: hover) {
+  .add-btn:hover {
+    background: rgba(167, 139, 250, 0.22);
+    border-color: var(--accent-purple);
+    transform: translateY(-2px);
+  }
 }
 
 .add-icon {
@@ -329,12 +349,25 @@ body {
   transition: all var(--transition);
 }
 
-.tag:hover,
 .tag.active {
   background: rgba(255, 124, 92, 0.15);
   border-color: var(--accent1);
   color: var(--accent1);
   transform: translateY(-1px);
+}
+
+.tag:active {
+  background: rgba(255, 124, 92, 0.25);
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .tag:hover {
+    background: rgba(255, 124, 92, 0.15);
+    border-color: var(--accent1);
+    color: var(--accent1);
+    transform: translateY(-1px);
+  }
 }
 
 /* ===== RESULTS ===== */
@@ -406,8 +439,10 @@ body {
   transition: transform 0.6s var(--transition);
 }
 
-.recipe-card:hover .card-image-wrapper img {
-  transform: scale(1.1);
+@media (hover: hover) {
+  .recipe-card:hover .card-image-wrapper img {
+    transform: scale(1.1);
+  }
 }
 
 .recipe-card::after {
@@ -429,14 +464,20 @@ body {
   z-index: 0;
 }
 
-.recipe-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-card);
-  border-color: var(--border-hover);
+.recipe-card:active {
+  transform: scale(0.98);
 }
 
-.recipe-card:hover::before {
-  opacity: 0.06;
+@media (hover: hover) {
+  .recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--border-hover);
+  }
+
+  .recipe-card:hover::before {
+    opacity: 0.06;
+  }
 }
 
 @keyframes cardIn {
@@ -618,11 +659,18 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.modal-close:hover {
+.modal-close:active {
   background: var(--accent1);
-  color: #fff;
-  transform: rotate(90deg);
-  border-color: transparent;
+  transform: scale(0.9);
+}
+
+@media (hover: hover) {
+  .modal-close:hover {
+    background: var(--accent1);
+    color: #fff;
+    transform: rotate(90deg);
+    border-color: transparent;
+  }
 }
 
 .modal-hero {
@@ -776,10 +824,16 @@ body {
   z-index: 2;
 }
 
-.input-with-button .inner-btn:hover {
-  background: var(--accent-purple);
-  border-color: var(--accent-purple);
-  transform: translateY(-50%) scale(1.02);
+.input-with-button .inner-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+@media (hover: hover) {
+  .input-with-button .inner-btn:hover {
+    background: var(--accent-purple);
+    border-color: var(--accent-purple);
+    transform: translateY(-50%) scale(1.02);
+  }
 }
 
 .image-input-wrapper {
@@ -888,10 +942,17 @@ body {
   font-family: inherit;
 }
 
-.action-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--text);
-  border-color: var(--border-hover);
+.action-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .action-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--text);
+    border-color: var(--border-hover);
+  }
 }
 
 #saveBtn {
@@ -900,18 +961,30 @@ body {
   border-color: rgba(110, 231, 183, 0.3);
 }
 
-#saveBtn:hover {
-  background: rgba(110, 231, 183, 0.2);
+#saveBtn:active {
+  background: rgba(110, 231, 183, 0.25);
+}
+
+@media (hover: hover) {
+  #saveBtn:hover {
+    background: rgba(110, 231, 183, 0.2);
+  }
 }
 
 .delete-btn {
   color: #fca5a5;
 }
 
-.delete-btn:hover {
-  background: rgba(252, 165, 165, 0.12);
-  color: #f87171;
-  border-color: rgba(252, 165, 165, 0.3);
+.delete-btn:active {
+  background: rgba(252, 165, 165, 0.2);
+}
+
+@media (hover: hover) {
+  .delete-btn:hover {
+    background: rgba(252, 165, 165, 0.12);
+    color: #f87171;
+    border-color: rgba(252, 165, 165, 0.3);
+  }
 }
 
 .modal-ingredients {
