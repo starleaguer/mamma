@@ -874,8 +874,8 @@ addRecipeModal.addEventListener('click', e => {
   if (e.target === addRecipeModal) closeAddModal();
 });
 
-editBtn.addEventListener('click', openEditForm);
-deleteBtn.addEventListener('click', deleteRecipe);
+if (editBtn) editBtn.addEventListener('click', openEditForm);
+if (deleteBtn) deleteBtn.addEventListener('click', deleteRecipe);
 
 if (viewFavoritesBtn) viewFavoritesBtn.addEventListener('click', viewFavorites);
 if (favoriteBtn) favoriteBtn.addEventListener('click', () => {
