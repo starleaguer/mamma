@@ -308,6 +308,8 @@ initApp();
 // ===== STATE =====
 let currentKeywords = [];
 let selectedModal = null;
+let favorites = JSON.parse(localStorage.getItem('recipeFavorites')) || [];
+let showingFavoritesOnly = false;
 
 const DEFAULT_TAGS = [
   { value: '쌀가루', label: '🌾 쌀가루' },
@@ -341,6 +343,7 @@ let tempEditTags = [];
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
 const viewAllBtn = document.getElementById('viewAllBtn');
+const viewFavoritesBtn = document.getElementById('viewFavoritesBtn');
 const clearBtn = document.getElementById('clearBtn');
 const recipeGrid = document.getElementById('recipeGrid');
 const resultsSection = document.getElementById('resultsSection');
@@ -351,6 +354,7 @@ const emptyState = document.getElementById('emptyState');
 const initialState = document.getElementById('initialState');
 const recipeModal = document.getElementById('recipeModal');
 const modalClose = document.getElementById('modalClose');
+const favoriteBtn = document.getElementById('favoriteBtn');
 const editBtn = document.getElementById('editBtn');
 const deleteBtn = document.getElementById('deleteBtn');
 const modalSteps = document.getElementById('modalSteps');
@@ -406,6 +410,7 @@ function matchRecipe(recipe, keywords) {
 }
 
 function search() {
+  showingFavoritesOnly = false;
   const raw = searchInput.value.trim();
   
   if (!raw) {
@@ -446,6 +451,42 @@ function handleLiveSearch() {
   searchTimeout = setTimeout(() => {
     search();
   }, 250);
+}
+
+// ===== FAVORITES LOGIC =====
+function toggleFavorite(id) {
+  const idx = favorites.indexOf(id);
+  if (idx > -1) {
+    favorites.splice(idx, 1);
+  } else {
+    favorites.push(id);
+  }
+  localStorage.setItem('recipeFavorites', JSON.stringify(favorites));
+
+  const favIcon = document.querySelector(`.recipe-card[data-recipe-id="${id}"] .fav-icon-btn`);
+  if (favIcon) {
+    favIcon.innerHTML = favorites.includes(id) ? '💖' : '🤍';
+    favIcon.style.transform = 'scale(1.2)';
+    setTimeout(() => { if(favIcon) favIcon.style.transform = 'scale(1)'; }, 150);
+  }
+
+  if (selectedModal && selectedModal.id === id && favoriteBtn) {
+    favoriteBtn.innerHTML = favorites.includes(id) ? '💖 찜완료' : '🤍 찜하기';
+  }
+
+  if (showingFavoritesOnly) {
+     viewFavorites();
+  }
+}
+
+function viewFavorites() {
+  searchInput.value = '';
+  currentKeywords = [];
+  showingFavoritesOnly = true;
+  document.querySelectorAll('#popularTags .tag').forEach(t => t.classList.remove('active'));
+  
+  const results = RECIPES.filter(r => favorites.includes(r.id)).map(recipe => ({ recipe, matched: [] }));
+  renderResults(results, '💖 찜한 레시피');
 }
 
 // ===== RENDER =====
@@ -504,17 +545,35 @@ function createCard(recipe, matchedKeywords, idx) {
     diffBg = 'rgba(255,99,71,0.15)'; diffColor = '#ff6347'; diffBorder = 'rgba(255,99,71,0.3)'; // 빨강
   }
 
+  const isFav = favorites.includes(recipe.id);
+
   div.innerHTML = `
     ${imageHTML}
-    <span style="position:absolute; top:1rem; right:1rem; font-size:0.72rem; background:${diffBg}; color:${diffColor}; border:1px solid ${diffBorder}; padding:0.2rem 0.6rem; border-radius:50px; font-weight:500; z-index:3;">⭐ ${recipe.difficulty}</span>
+    <div style="position:absolute; top:1rem; right:1rem; z-index:4; display:flex; align-items:center; gap:0.5rem;">
+      <div class="fav-icon-btn" data-id="${recipe.id}" style="font-size:1.4rem; cursor:pointer; text-shadow:0 3px 6px rgba(0,0,0,0.6); transition: transform 0.2s; line-height:1;">
+        ${isFav ? '💖' : '🤍'}
+      </div>
+      <span style="font-size:0.72rem; background:${diffBg}; color:${diffColor}; border:1px solid ${diffBorder}; padding:0.2rem 0.6rem; border-radius:50px; font-weight:500;">⭐ ${recipe.difficulty}</span>
+    </div>
     ${recipe.image_url ? '' : `<span class="card-emoji">${recipe.emoji}</span>`}
     <div class="card-name">${recipe.name}</div>
     <div class="card-desc">${recipe.description}</div>
     <div class="card-tags">${tagHTML}</div>
   `;
 
-  div.addEventListener('click', () => openModal(recipe, matchedKeywords));
-  div.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(recipe, matchedKeywords); });
+  div.addEventListener('click', (e) => {
+    if (e.target.closest('.fav-icon-btn')) {
+      toggleFavorite(recipe.id);
+      return;
+    }
+    openModal(recipe, matchedKeywords);
+  });
+  div.addEventListener('keydown', e => { 
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (document.activeElement.classList.contains('fav-icon-btn')) return;
+      openModal(recipe, matchedKeywords);
+    }
+  });
   return div;
 }
 
@@ -552,6 +611,10 @@ function openModal(recipe, matchedKeywords) {
   document.getElementById('modalBadges').innerHTML = `
     <span class="modal-badge" style="background:${diffBg}; color:${diffColor}; border:1px solid ${diffBorder};">⭐ ${recipe.difficulty}</span>
   `;
+
+  if (favoriteBtn) {
+    favoriteBtn.innerHTML = favorites.includes(recipe.id) ? '💖 찜완료' : '🤍 찜하기';
+  }
 
   document.getElementById('modalIngredients').innerHTML = recipe.ingredients.map(ing => {
     const isMatch = matchedKeywords.some(kw =>
@@ -772,6 +835,7 @@ async function handleAddRecipe(e) {
 viewAllBtn.addEventListener('click', () => {
   searchInput.value = '';
   currentKeywords = [];
+  showingFavoritesOnly = false;
   document.querySelectorAll('#popularTags .tag').forEach(t => t.classList.remove('active'));
   
   // Show all recipes
@@ -790,6 +854,7 @@ clearBtn.addEventListener('click', () => {
   searchInput.value = '';
   searchInput.focus();
   currentKeywords = [];
+  showingFavoritesOnly = false;
   recipeGrid.innerHTML = '';
   resultsHeader.classList.add('hidden');
   emptyState.classList.add('hidden');
@@ -811,6 +876,11 @@ addRecipeModal.addEventListener('click', e => {
 
 editBtn.addEventListener('click', openEditForm);
 deleteBtn.addEventListener('click', deleteRecipe);
+
+if (viewFavoritesBtn) viewFavoritesBtn.addEventListener('click', viewFavorites);
+if (favoriteBtn) favoriteBtn.addEventListener('click', () => {
+  if (selectedModal) toggleFavorite(selectedModal.id);
+});
 
 recipeModal.addEventListener('click', e => {
   if (e.target === recipeModal) closeModal();
