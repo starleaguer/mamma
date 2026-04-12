@@ -4,3 +4,5 @@ final_audit.py
 update_descriptions.py
 list_models.py
 requirements.txt
+config.js
+node_modules/

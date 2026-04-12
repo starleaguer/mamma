@@ -256,12 +256,12 @@ const DEFAULT_RECIPES = [
 
 // ===== SUPABASE CLIENT =====
 const { createClient } = supabase;
-const SUPABASE_URL = 'https://nvraninnkutvebdgnlfv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cmFuaW5ua3V0dmViZGdubGZ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNTgzMDcsImV4cCI6MjA4OTkzNDMwN30.wH1ewf0ArHsOTeulFdhAcHrWM18_Fh9SooSJtUNCYUI';
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = window.CONFIG?.SUPABASE_URL || '';
+const SUPABASE_KEY = window.CONFIG?.SUPABASE_KEY || '';
+const BASE_URL = window.CONFIG?.BASE_URL || 'https://mamma-blond.vercel.app';
+const supabaseClient = SUPABASE_URL && SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 // Helper to normalize image URLs by removing the base URL
-const BASE_URL = 'https://mamma-blond.vercel.app';
 function normalizeImageUrl(url) {
   if (!url) return '';
   return url.replace(BASE_URL, '').trim();
@@ -272,6 +272,12 @@ let RECIPES = [];
 
 // Initialize App: Fetch from Supabase
 async function initApp() {
+  if (!supabaseClient) {
+    console.error('Supabase configuration missing. Using local recipe fallback.');
+    RECIPES = JSON.parse(localStorage.getItem('myRecipes')) || DEFAULT_RECIPES;
+    return;
+  }
+
   const { data, error } = await supabaseClient
     .from('recipes')
     .select('*')
